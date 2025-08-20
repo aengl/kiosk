@@ -11,7 +11,7 @@ html, body {
 }
 
 #text-display, .particle {
-  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-family: Menlo, Monaco, 'SF Mono', 'Courier New', monospace;
 }
 
 #text-display {
