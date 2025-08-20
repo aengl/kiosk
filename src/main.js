@@ -288,20 +288,6 @@ function handleKeyPress(event) {
     updateDisplay();
   }
   
-  // Handle enter as a space
-  if (char === 'Enter') {
-    if (currentText.length < MAX_CHARACTERS) {
-      currentText += ' ';
-      updateDisplay();
-      playRandomTypewriterSound();
-      
-      // Play bell when reaching exactly max characters
-      if (currentText.length === MAX_CHARACTERS) {
-        playBellSound();
-      }
-    }
-    // Do nothing if already at max characters
-  }
   
   // Prevent default behavior for most keys
   event.preventDefault();
