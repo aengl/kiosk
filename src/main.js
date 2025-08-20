@@ -183,13 +183,25 @@ function spawnParticleEffect(x, y, char) {
 }
 
 function updateParticles() {
+  const maxParticles = 60; // Threshold for accelerated decay
+  const excessCount = Math.max(0, particles.length - maxParticles);
+  
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     
     p.x += p.vx;
     p.y += p.vy;
     p.vy += 0.2; // gravity
-    p.life -= p.decay;
+    
+    // Accelerate decay for older particles when we have too many
+    let currentDecay = p.decay;
+    if (excessCount > 0) {
+      // Older particles (earlier in array) get more accelerated decay
+      const ageMultiplier = 1 + (excessCount * 0.05) + ((particles.length - i) * 0.02);
+      currentDecay *= ageMultiplier;
+    }
+    
+    p.life -= currentDecay;
     
     if (p.life <= 0) {
       particles.splice(i, 1);
