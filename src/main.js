@@ -1,3 +1,7 @@
+// Configuration constants
+const MAX_CHARACTERS = 32;
+const INITIAL_FONT_SIZE = 90; // vmin
+
 let currentText = '';
 const textDisplay = document.getElementById('text-display');
 let particles = [];
@@ -89,7 +93,7 @@ function updateDisplay() {
   textDisplay.textContent = currentText;
   
   if (currentText.length === 0) {
-    textDisplay.style.fontSize = '20vmin';
+    textDisplay.style.fontSize = `${INITIAL_FONT_SIZE}vmin`;
     // Generate random HSL color with reasonable lightness/saturation
     const hue = Math.floor(Math.random() * 360);
     const saturation = 60 + Math.floor(Math.random() * 40); // 60-100%
@@ -99,7 +103,7 @@ function updateDisplay() {
   }
   
   // Start with a large font size and measure
-  let fontSize = 20; // vmin
+  let fontSize = INITIAL_FONT_SIZE; // vmin - start much larger
   textDisplay.style.fontSize = `${fontSize}vmin`;
   
   // Get the available width (90% of viewport width)
@@ -261,17 +265,17 @@ function handleKeyPress(event) {
   
   // Handle regular characters (letters, numbers, symbols, spaces)
   if (char.length === 1 && char !== 'Dead') {
-    if (currentText.length < 32) {
+    if (currentText.length < MAX_CHARACTERS) {
       currentText += char;
       updateDisplay();
       playRandomTypewriterSound();
       
-      // Play bell when reaching exactly 32 characters
-      if (currentText.length === 32) {
+      // Play bell when reaching exactly max characters
+      if (currentText.length === MAX_CHARACTERS) {
         playBellSound();
       }
     }
-    // Do nothing if already at 32 characters (no sound, no adding)
+    // Do nothing if already at max characters (no sound, no adding)
   }
   
   // Handle backspace
@@ -286,17 +290,17 @@ function handleKeyPress(event) {
   
   // Handle enter as a space
   if (char === 'Enter') {
-    if (currentText.length < 32) {
+    if (currentText.length < MAX_CHARACTERS) {
       currentText += ' ';
       updateDisplay();
       playRandomTypewriterSound();
       
-      // Play bell when reaching exactly 32 characters
-      if (currentText.length === 32) {
+      // Play bell when reaching exactly max characters
+      if (currentText.length === MAX_CHARACTERS) {
         playBellSound();
       }
     }
-    // Do nothing if already at 32 characters
+    // Do nothing if already at max characters
   }
   
   // Prevent default behavior for most keys
