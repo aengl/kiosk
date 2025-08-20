@@ -4,6 +4,14 @@ const INITIAL_FONT_SIZE = 90; // vmin
 
 let currentText = '';
 const textDisplay = document.getElementById('text-display');
+
+// Set initial random color
+function setRandomColor() {
+  const lightness = 0.55 + Math.random() * 0.35; // 0.55-0.9 (wider range)
+  const chroma = 0.1 + Math.random() * 0.2;      // 0.1-0.3 (more vibrant)
+  const hue = Math.random() * 360;               // 0-360 degrees
+  textDisplay.style.color = `oklch(${lightness} ${chroma} ${hue})`;
+}
 let particles = [];
 
 // Web Audio API for low-latency typewriter sounds
@@ -94,11 +102,7 @@ function updateDisplay() {
   
   if (currentText.length === 0) {
     textDisplay.style.fontSize = `${INITIAL_FONT_SIZE}vmin`;
-    // Generate random HSL color with reasonable lightness/saturation
-    const hue = Math.floor(Math.random() * 360);
-    const saturation = 60 + Math.floor(Math.random() * 40); // 60-100%
-    const lightness = 50 + Math.floor(Math.random() * 30);  // 50-80%
-    textDisplay.style.color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    setRandomColor();
     return;
   }
   
@@ -231,14 +235,13 @@ function renderParticles() {
     particle.style.position = 'fixed';
     particle.style.left = p.x + 'px';
     particle.style.top = p.y + 'px';
-    // Extract RGB values from stored color and apply life-based alpha
-    const rgbMatch = p.color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-    if (rgbMatch) {
-      const [, r, g, b] = rgbMatch;
-      particle.style.color = `rgba(${r}, ${g}, ${b}, ${p.life})`;
+    // Extract OKLCH values and apply life-based alpha
+    const oklchMatch = p.color.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)\)/);
+    if (oklchMatch) {
+      const [, l, c, h] = oklchMatch;
+      particle.style.color = `oklch(${l} ${c} ${h} / ${p.life})`;
     } else {
-      // Fallback to original color with alpha
-      particle.style.color = p.color.replace('rgb(', 'rgba(').replace(')', `, ${p.life})`);
+      particle.style.color = p.color;
     }
     particle.style.fontFamily = 'monospace';
     particle.style.fontSize = (parseFloat(textDisplay.style.fontSize) * p.size) + 'vmin';
@@ -300,6 +303,7 @@ document.addEventListener('keydown', handleKeyPress);
 document.addEventListener('DOMContentLoaded', () => {
   document.body.focus();
   initAudio();
+  setRandomColor();
 });
 
 // Make sure the document can receive focus
