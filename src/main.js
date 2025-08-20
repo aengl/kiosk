@@ -90,6 +90,11 @@ function updateDisplay() {
   
   if (currentText.length === 0) {
     textDisplay.style.fontSize = '20vmin';
+    // Generate random HSL color with reasonable lightness/saturation
+    const hue = Math.floor(Math.random() * 360);
+    const saturation = 60 + Math.floor(Math.random() * 40); // 60-100%
+    const lightness = 50 + Math.floor(Math.random() * 30);  // 50-80%
+    textDisplay.style.color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
     return;
   }
   
@@ -162,7 +167,7 @@ function calculateLastCharPosition() {
   };
 }
 
-function createParticle(x, y, char) {
+function createParticle(x, y, char, color) {
   return {
     x: x,
     y: y,
@@ -171,14 +176,16 @@ function createParticle(x, y, char) {
     life: 1.0,
     decay: 0.02 + Math.random() * 0.02,
     char: char,
-    size: Math.random() * 0.5 + 0.5
+    size: Math.random() * 0.5 + 0.5,
+    color: color
   };
 }
 
 function spawnParticleEffect(x, y, char) {
   const numParticles = 8 + Math.random() * 6;
+  const currentColor = getComputedStyle(textDisplay).color;
   for (let i = 0; i < numParticles; i++) {
-    particles.push(createParticle(x, y, char));
+    particles.push(createParticle(x, y, char, currentColor));
   }
 }
 
@@ -220,7 +227,15 @@ function renderParticles() {
     particle.style.position = 'fixed';
     particle.style.left = p.x + 'px';
     particle.style.top = p.y + 'px';
-    particle.style.color = `rgba(255, 255, 255, ${p.life})`;
+    // Extract RGB values from stored color and apply life-based alpha
+    const rgbMatch = p.color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (rgbMatch) {
+      const [, r, g, b] = rgbMatch;
+      particle.style.color = `rgba(${r}, ${g}, ${b}, ${p.life})`;
+    } else {
+      // Fallback to original color with alpha
+      particle.style.color = p.color.replace('rgb(', 'rgba(').replace(')', `, ${p.life})`);
+    }
     particle.style.fontFamily = 'monospace';
     particle.style.fontSize = (parseFloat(textDisplay.style.fontSize) * p.size) + 'vmin';
     particle.style.pointerEvents = 'none';
@@ -246,17 +261,17 @@ function handleKeyPress(event) {
   
   // Handle regular characters (letters, numbers, symbols, spaces)
   if (char.length === 1 && char !== 'Dead') {
-    if (currentText.length < 42) {
+    if (currentText.length < 32) {
       currentText += char;
       updateDisplay();
       playRandomTypewriterSound();
       
-      // Play bell when reaching exactly 42 characters
-      if (currentText.length === 42) {
+      // Play bell when reaching exactly 32 characters
+      if (currentText.length === 32) {
         playBellSound();
       }
     }
-    // Do nothing if already at 42 characters (no sound, no adding)
+    // Do nothing if already at 32 characters (no sound, no adding)
   }
   
   // Handle backspace
@@ -271,17 +286,17 @@ function handleKeyPress(event) {
   
   // Handle enter as a space
   if (char === 'Enter') {
-    if (currentText.length < 42) {
+    if (currentText.length < 32) {
       currentText += ' ';
       updateDisplay();
       playRandomTypewriterSound();
       
-      // Play bell when reaching exactly 42 characters
-      if (currentText.length === 42) {
+      // Play bell when reaching exactly 32 characters
+      if (currentText.length === 32) {
         playBellSound();
       }
     }
-    // Do nothing if already at 42 characters
+    // Do nothing if already at 32 characters
   }
   
   // Prevent default behavior for most keys
