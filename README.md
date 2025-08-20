@@ -5,10 +5,12 @@ A fullscreen kiosk application built with Tauri that creates an immersive text t
 ## Features
 
 - **Fullscreen Kiosk Mode**: Clean, distraction-free interface with no window decorations
-- **Dynamic Font Scaling**: Text automatically resizes to fit 90% of viewport width
-- **Typewriter Audio**: Authentic typewriter sounds with random variation for each keystroke
-- **Character Limit**: 42-character limit with bell sound notification
-- **Particle Effects**: Visual feedback with smart particle lifecycle management during backspace
+- **Dynamic Font Scaling**: Text automatically resizes to fit 90% of viewport width for optimal readability
+- **Typewriter Audio**: Authentic typewriter sounds with random variation (3 different sounds) for each keystroke
+- **Character Limit**: 32-character limit with bell sound notification when reached
+- **Particle Effects**: Visual feedback with smart particle lifecycle management during backspace operations
+- **Color Variety**: Random OKLCH color selection on startup and reset for vibrant text display
+- **Audio Feedback**: Bell sound at character limit, carriage return sound on text reset
 - **Real-time Input**: Immediate character display with monospace font rendering
 
 ## Development
@@ -22,14 +24,17 @@ pnpm tauri dev
 
 # Build for production
 pnpm tauri build
+
+# Show environment info
+pnpm tauri info
 ```
 
 ## Controls
 
 - **Type**: Any alphanumeric character, symbol, or space
-- **Enter**: Acts as a space character
 - **Backspace**: Removes last character with particle effect
-- **42 Characters**: Bell sound plays when limit is reached
+- **32 Characters**: Bell sound plays when limit is reached
+- **Empty Text**: Carriage return sound plays and color randomizes when text becomes empty
 
 ## Audio Attributions
 
@@ -37,3 +42,4 @@ pnpm tauri build
 - **Typewriter - single key - type 1.wav** by yottasounds -- https://freesound.org/s/380138/ -- License: Creative Commons 0
 - **Typewriter - single key - type 2.wav** by yottasounds -- https://freesound.org/s/380137/ -- License: Creative Commons 0
 - **Typewriter - single key - type 3.wav** by yottasounds -- https://freesound.org/s/380136/ -- License: Creative Commons 0
+- **Typewriter Carriage Return.wav** by ramsamba -- https://freesound.org/s/318686/ -- License: Creative Commons 0
