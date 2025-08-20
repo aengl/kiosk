@@ -219,7 +219,8 @@ function createParticle(x, y, char, color) {
     decay: 0.02 + Math.random() * 0.02,
     char: char,
     size: Math.random() * 0.5 + 0.5,
-    color: color
+    color: color,
+    element: null
   };
 }
 
@@ -253,38 +254,41 @@ function updateParticles() {
     p.life -= currentDecay;
     
     if (p.life <= 0) {
+      // Clean up DOM element when particle dies
+      if (p.element) {
+        p.element.remove();
+      }
       particles.splice(i, 1);
     }
   }
 }
 
 function renderParticles() {
-  // Remove old particle elements
-  document.querySelectorAll('.particle').forEach(el => el.remove());
-  
   particles.forEach(p => {
-    const particle = document.createElement('div');
-    particle.className = 'particle';
-    particle.textContent = p.char;
-    particle.style.position = 'fixed';
-    particle.style.left = p.x + 'px';
-    particle.style.top = p.y + 'px';
-    // Extract OKLCH values and apply life-based alpha
+    // Create DOM element only if it doesn't exist
+    if (!p.element) {
+      p.element = document.createElement('div');
+      p.element.className = 'particle';
+      p.element.textContent = p.char;
+      p.element.style.position = 'fixed';
+      p.element.style.pointerEvents = 'none';
+      p.element.style.userSelect = 'none';
+      p.element.style.zIndex = '1000';
+      document.body.appendChild(p.element);
+    }
+    
+    // Update position using GPU-accelerated transform
+    p.element.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) translate(-50%, -50%)`;
+    
+    // Update dynamic properties
     const oklchMatch = p.color.match(/oklch\(([\d.]+)\s+([\d.]+)\s+([\d.]+)\)/);
     if (oklchMatch) {
       const [, l, c, h] = oklchMatch;
-      particle.style.color = `oklch(${l} ${c} ${h} / ${p.life})`;
+      p.element.style.color = `oklch(${l} ${c} ${h} / ${p.life})`;
     } else {
-      particle.style.color = p.color;
+      p.element.style.color = p.color;
     }
-    particle.style.fontFamily = 'monospace';
-    particle.style.fontSize = (parseFloat(textDisplay.style.fontSize) * p.size) + 'vmin';
-    particle.style.pointerEvents = 'none';
-    particle.style.userSelect = 'none';
-    particle.style.transform = 'translate(-50%, -50%)';
-    particle.style.zIndex = '1000';
-    
-    document.body.appendChild(particle);
+    p.element.style.fontSize = (parseFloat(textDisplay.style.fontSize) * p.size) + 'vmin';
   });
 }
 
