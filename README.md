@@ -11,7 +11,7 @@ A fullscreen kiosk application built with Tauri that creates an immersive text t
 - **Particle Effects**: Visual feedback with smart particle lifecycle management during backspace operations
 - **Color Variety**: Random OKLCH color selection on startup and reset for vibrant text display
 - **Audio Feedback**: Bell sound at character limit, carriage return sound on text reset
-- **Real-time Input**: Immediate character display with monospace font rendering
+- **Real-time Input**: Immediate character display with Atkinson Hyperlegible font for optimal readability
 
 ## Development
 

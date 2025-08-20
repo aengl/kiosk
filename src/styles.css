@@ -16,7 +16,7 @@ html, body {
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
-  font-family: monospace;
+  font-family: 'Atkinson Hyperlegible', sans-serif;
   font-size: 20vmin;
   text-align: center;
   white-space: nowrap;
