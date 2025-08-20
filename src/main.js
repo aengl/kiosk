@@ -4,11 +4,40 @@ const textDisplay = document.getElementById('text-display');
 function updateDisplay() {
   textDisplay.textContent = currentText;
   
-  // Calculate font size based on text length
-  const baseSize = 10;
-  const minSize = 2;
-  const scaleFactor = Math.max(minSize, baseSize - (currentText.length * 0.2));
-  textDisplay.style.fontSize = `${scaleFactor}vmin`;
+  if (currentText.length === 0) {
+    textDisplay.style.fontSize = '20vmin';
+    return;
+  }
+  
+  // Start with a large font size and measure
+  let fontSize = 20; // vmin
+  textDisplay.style.fontSize = `${fontSize}vmin`;
+  
+  // Get the available width (90% of viewport width)
+  const maxWidth = window.innerWidth * 0.9;
+  
+  // Create a temporary element to measure actual text width
+  const tempElement = document.createElement('span');
+  tempElement.style.visibility = 'hidden';
+  tempElement.style.position = 'absolute';
+  tempElement.style.whiteSpace = 'nowrap';
+  tempElement.style.fontFamily = 'monospace';
+  tempElement.textContent = currentText;
+  document.body.appendChild(tempElement);
+  
+  // If text is too wide, reduce font size until it fits
+  let textWidth = 0;
+  do {
+    tempElement.style.fontSize = `${fontSize}vmin`;
+    textWidth = tempElement.getBoundingClientRect().width;
+    if (textWidth > maxWidth && fontSize > 2) {
+      fontSize -= 0.5;
+    }
+  } while (textWidth > maxWidth && fontSize > 2);
+  
+  // Apply the calculated font size and clean up
+  textDisplay.style.fontSize = `${fontSize}vmin`;
+  document.body.removeChild(tempElement);
 }
 
 function handleKeyPress(event) {

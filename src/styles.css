@@ -17,8 +17,10 @@ html, body {
   transform: translate(-50%, -50%);
   color: white;
   font-family: monospace;
-  font-size: 10vmin;
+  font-size: 20vmin;
   text-align: center;
   white-space: nowrap;
   user-select: none;
+  width: 90vw;
+  max-width: 90vw;
 }

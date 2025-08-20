@@ -1,0 +1,1 @@
+- Always run the app at the end of an implementation so I can test
