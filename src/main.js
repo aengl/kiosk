@@ -18,6 +18,7 @@ let particles = [];
 let audioContext;
 const audioBuffers = [];
 let bellBuffer = null;
+let resetBuffer = null;
 
 async function initAudio() {
   try {
@@ -44,6 +45,15 @@ async function initAudio() {
       bellBuffer = await audioContext.decodeAudioData(bellArrayBuffer);
     } catch (e) {
       console.warn('Failed to load bell.wav:', e);
+    }
+    
+    // Load reset sound
+    try {
+      const resetResponse = await fetch('reset.wav');
+      const resetArrayBuffer = await resetResponse.arrayBuffer();
+      resetBuffer = await audioContext.decodeAudioData(resetArrayBuffer);
+    } catch (e) {
+      console.warn('Failed to load reset.wav:', e);
     }
   } catch (e) {
     console.warn('Audio context initialization failed:', e);
@@ -97,12 +107,36 @@ function playBellSound() {
   }
 }
 
+function playResetSound() {
+  if (!audioContext || !resetBuffer) return;
+  
+  try {
+    // Resume audio context if suspended
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+    
+    const source = audioContext.createBufferSource();
+    const gainNode = audioContext.createGain();
+    
+    source.buffer = resetBuffer;
+    source.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    gainNode.gain.value = 0.8; // Reset sound volume
+    source.start(0);
+  } catch (e) {
+    console.warn('Reset sound play failed:', e);
+  }
+}
+
 function updateDisplay() {
   textDisplay.textContent = currentText;
   
   if (currentText.length === 0) {
     textDisplay.style.fontSize = `${INITIAL_FONT_SIZE}vmin`;
     setRandomColor();
+    playResetSound();
     return;
   }
   

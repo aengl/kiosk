@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pnpm tauri:*)"
+      "Bash(pnpm tauri:*)",
+      "Bash(git add:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []
