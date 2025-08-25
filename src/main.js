@@ -333,6 +333,21 @@ function handleKeyPress(event) {
     return;
   }
   
+  if (char === 'F2') {
+    // Trigger jump animation
+    textDisplay.classList.remove('jump-animation');
+    void textDisplay.offsetHeight; // Force reflow to restart animation
+    textDisplay.classList.add('jump-animation');
+    
+    // Remove class after animation completes
+    setTimeout(() => {
+      textDisplay.classList.remove('jump-animation');
+    }, 600);
+    
+    event.preventDefault();
+    return;
+  }
+  
   // Handle regular characters (letters, numbers, symbols, spaces)
   if (char.length === 1 && char !== 'Dead') {
     if (currentText.length < MAX_CHARACTERS) {
