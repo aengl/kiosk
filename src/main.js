@@ -2,6 +2,15 @@
 const MAX_CHARACTERS = 32;
 const INITIAL_FONT_SIZE = 90; // vmin
 
+// Dictionary of 3-5 letter words
+const WORDS = [
+  'cat', 'dog', 'run', 'sun', 'fun', 'big', 'top', 'red', 'hat', 'cup',
+  'book', 'tree', 'fish', 'bird', 'rock', 'cake', 'moon', 'star', 'game', 'door',
+  'house', 'water', 'paper', 'phone', 'music', 'light', 'chair', 'table', 'green', 'smile',
+  'happy', 'quick', 'bread', 'cloud', 'beach', 'dream', 'magic', 'dance', 'heart', 'ocean',
+  'world', 'peace', 'brave', 'sweet', 'focus', 'sharp', 'grace', 'spark', 'fresh', 'royal'
+];
+
 let currentText = '';
 let wasAtMaxCharacters = false; // Track if we were at max characters
 const textDisplay = document.getElementById('text-display');
@@ -129,6 +138,10 @@ function playResetSound() {
   } catch (e) {
     console.warn('Reset sound play failed:', e);
   }
+}
+
+function generateRandomWord() {
+  return WORDS[Math.floor(Math.random() * WORDS.length)];
 }
 
 function updateDisplay() {
@@ -308,6 +321,17 @@ animateParticles();
 
 function handleKeyPress(event) {
   const char = event.key;
+  
+  // Handle F-key bindings
+  if (char === 'F1') {
+    const randomWord = generateRandomWord();
+    currentText = randomWord;
+    setRandomColor();
+    updateDisplay();
+    playRandomTypewriterSound();
+    event.preventDefault();
+    return;
+  }
   
   // Handle regular characters (letters, numbers, symbols, spaces)
   if (char.length === 1 && char !== 'Dead') {
