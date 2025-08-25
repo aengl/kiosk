@@ -3,6 +3,7 @@ const MAX_CHARACTERS = 32;
 const INITIAL_FONT_SIZE = 90; // vmin
 
 let currentText = '';
+let wasAtMaxCharacters = false; // Track if we were at max characters
 const textDisplay = document.getElementById('text-display');
 
 // Set initial random color
@@ -136,7 +137,11 @@ function updateDisplay() {
   if (currentText.length === 0) {
     textDisplay.style.fontSize = `${INITIAL_FONT_SIZE}vmin`;
     setRandomColor();
-    playResetSound();
+    // Only play reset sound if we were previously at max characters
+    if (wasAtMaxCharacters) {
+      playResetSound();
+      wasAtMaxCharacters = false;
+    }
     return;
   }
   
@@ -314,6 +319,7 @@ function handleKeyPress(event) {
       // Play bell when reaching exactly max characters
       if (currentText.length === MAX_CHARACTERS) {
         playBellSound();
+        wasAtMaxCharacters = true;
       }
     }
     // Do nothing if already at max characters (no sound, no adding)
