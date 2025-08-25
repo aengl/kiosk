@@ -43,3 +43,4 @@ pnpm tauri info
 - **Typewriter - single key - type 2.wav** by yottasounds -- https://freesound.org/s/380137/ -- License: Creative Commons 0
 - **Typewriter - single key - type 3.wav** by yottasounds -- https://freesound.org/s/380136/ -- License: Creative Commons 0
 - **Typewriter Carriage Return.wav** by ramsamba -- https://freesound.org/s/318686/ -- License: Creative Commons 0
+- **boing.wav**: "Boing 1" by magnuswaker -- https://freesound.org/s/540788/ -- License: Creative Commons 0

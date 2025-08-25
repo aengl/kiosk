@@ -13,6 +13,7 @@ const WORDS = [
 
 let currentText = '';
 let wasAtMaxCharacters = false; // Track if we were at max characters
+let isJumpAnimating = false; // Track if jump animation is currently playing
 const textDisplay = document.getElementById('text-display');
 
 // Set initial random color
@@ -29,6 +30,7 @@ let audioContext;
 const audioBuffers = [];
 let bellBuffer = null;
 let resetBuffer = null;
+let boingBuffer = null;
 
 async function initAudio() {
   try {
@@ -64,6 +66,15 @@ async function initAudio() {
       resetBuffer = await audioContext.decodeAudioData(resetArrayBuffer);
     } catch (e) {
       console.warn('Failed to load reset.wav:', e);
+    }
+    
+    // Load boing sound
+    try {
+      const boingResponse = await fetch('boing.wav');
+      const boingArrayBuffer = await boingResponse.arrayBuffer();
+      boingBuffer = await audioContext.decodeAudioData(boingArrayBuffer);
+    } catch (e) {
+      console.warn('Failed to load boing.wav:', e);
     }
   } catch (e) {
     console.warn('Audio context initialization failed:', e);
@@ -137,6 +148,29 @@ function playResetSound() {
     source.start(0);
   } catch (e) {
     console.warn('Reset sound play failed:', e);
+  }
+}
+
+function playBoingSound() {
+  if (!audioContext || !boingBuffer) return;
+  
+  try {
+    // Resume audio context if suspended
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+    
+    const source = audioContext.createBufferSource();
+    const gainNode = audioContext.createGain();
+    
+    source.buffer = boingBuffer;
+    source.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    gainNode.gain.value = 1.0; // Boing sound volume
+    source.start(0);
+  } catch (e) {
+    console.warn('Boing sound play failed:', e);
   }
 }
 
@@ -334,16 +368,32 @@ function handleKeyPress(event) {
   }
   
   if (char === 'F2') {
+    // Ignore F2 if animation is already playing
+    if (isJumpAnimating) {
+      event.preventDefault();
+      return;
+    }
+    
     // Trigger jump animation
+    isJumpAnimating = true;
     textDisplay.classList.remove('jump-animation');
     void textDisplay.offsetHeight; // Force reflow to restart animation
     textDisplay.classList.add('jump-animation');
+    playBoingSound();
     
-    // Remove class after animation completes
+    // Remove class and reset flag after animation completes
     setTimeout(() => {
       textDisplay.classList.remove('jump-animation');
+      isJumpAnimating = false;
     }, 600);
     
+    event.preventDefault();
+    return;
+  }
+  
+  if (char === 'F3') {
+    // Change to random color with smooth transition
+    setRandomColor();
     event.preventDefault();
     return;
   }
