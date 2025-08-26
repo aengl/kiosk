@@ -9,12 +9,22 @@ let wasAtMaxCharacters = false; // Track if we were at max characters
 let isJumpAnimating = false; // Track if jump animation is currently playing
 const textDisplay = document.getElementById('text-display');
 
+// Color state for arrow key control
+let currentHue = 0;
+let currentLightness = 0.7;
+
 // Set initial random color
 function setRandomColor() {
-  const lightness = 0.55 + Math.random() * 0.35; // 0.55-0.9 (wider range)
-  const chroma = 0.1 + Math.random() * 0.2;      // 0.1-0.3 (more vibrant)
-  const hue = Math.random() * 360;               // 0-360 degrees
-  textDisplay.style.color = `oklch(${lightness} ${chroma} ${hue})`;
+  currentLightness = 0.55 + Math.random() * 0.35; // 0.55-0.9 (wider range)
+  currentHue = Math.random() * 360;                // 0-360 degrees
+  const chroma = 0.3;                             // Maximum saturation
+  textDisplay.style.color = `oklch(${currentLightness} ${chroma} ${currentHue})`;
+}
+
+// Update color with current hue and lightness values
+function updateColor() {
+  const chroma = 0.3; // Maximum saturation
+  textDisplay.style.color = `oklch(${currentLightness} ${chroma} ${currentHue})`;
 }
 let particles = [];
 
@@ -385,8 +395,37 @@ function handleKeyPress(event) {
   }
   
   if (char === 'F3') {
-    // Change to random color with smooth transition
+    // Change to random color
     setRandomColor();
+    event.preventDefault();
+    return;
+  }
+  
+  // Handle arrow keys for color control
+  if (char === 'ArrowLeft') {
+    currentHue = (currentHue - 10 + 360) % 360;
+    updateColor();
+    event.preventDefault();
+    return;
+  }
+  
+  if (char === 'ArrowRight') {
+    currentHue = (currentHue + 10) % 360;
+    updateColor();
+    event.preventDefault();
+    return;
+  }
+  
+  if (char === 'ArrowUp') {
+    currentLightness = Math.min(0.9, currentLightness + 0.05);
+    updateColor();
+    event.preventDefault();
+    return;
+  }
+  
+  if (char === 'ArrowDown') {
+    currentLightness = Math.max(0.1, currentLightness - 0.05);
+    updateColor();
     event.preventDefault();
     return;
   }

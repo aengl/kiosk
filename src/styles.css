@@ -26,7 +26,6 @@ html, body {
   user-select: none;
   width: 90vw;
   max-width: 90vw;
-  transition: color 700ms ease-in-out;
 }
 
 @keyframes jump {
