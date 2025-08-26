@@ -7,6 +7,7 @@ const INITIAL_FONT_SIZE = 90; // vmin
 let currentText = '';
 let wasAtMaxCharacters = false; // Track if we were at max characters
 let isJumpAnimating = false; // Track if jump animation is currently playing
+let isPopAnimating = false; // Track if pop animation is currently playing
 const textDisplay = document.getElementById('text-display');
 
 // Color state for arrow key control
@@ -34,6 +35,7 @@ const audioBuffers = [];
 let bellBuffer = null;
 let resetBuffer = null;
 let boingBuffer = null;
+let popBuffer = null;
 
 async function initAudio() {
   try {
@@ -78,6 +80,15 @@ async function initAudio() {
       boingBuffer = await audioContext.decodeAudioData(boingArrayBuffer);
     } catch (e) {
       console.warn('Failed to load boing.wav:', e);
+    }
+    
+    // Load pop sound
+    try {
+      const popResponse = await fetch('pop.wav');
+      const popArrayBuffer = await popResponse.arrayBuffer();
+      popBuffer = await audioContext.decodeAudioData(popArrayBuffer);
+    } catch (e) {
+      console.warn('Failed to load pop.wav:', e);
     }
   } catch (e) {
     console.warn('Audio context initialization failed:', e);
@@ -174,6 +185,29 @@ function playBoingSound() {
     source.start(0);
   } catch (e) {
     console.warn('Boing sound play failed:', e);
+  }
+}
+
+function playPopSound() {
+  if (!audioContext || !popBuffer) return;
+  
+  try {
+    // Resume audio context if suspended
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+    
+    const source = audioContext.createBufferSource();
+    const gainNode = audioContext.createGain();
+    
+    source.buffer = popBuffer;
+    source.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    gainNode.gain.value = 1.0; // Pop sound volume
+    source.start(0);
+  } catch (e) {
+    console.warn('Pop sound play failed:', e);
   }
 }
 
@@ -361,11 +395,34 @@ function handleKeyPress(event) {
   
   // Handle F-key bindings
   if (char === 'F1') {
+    // Ignore F1 if animation is already playing
+    if (isPopAnimating) {
+      event.preventDefault();
+      return;
+    }
+    
     const randomWord = generateRandomWord();
     currentText = randomWord;
     setRandomColor();
     updateDisplay();
-    playRandomTypewriterSound();
+    
+    // Trigger pop animation
+    isPopAnimating = true;
+    textDisplay.classList.remove('pop-animation');
+    void textDisplay.offsetHeight; // Force reflow to restart animation
+    textDisplay.classList.add('pop-animation');
+    
+    // Play pop sound at the peak of the animation (adjusted for audio latency)
+    setTimeout(() => {
+      playPopSound();
+    }, 150);
+    
+    // Remove class and reset flag after animation completes
+    setTimeout(() => {
+      textDisplay.classList.remove('pop-animation');
+      isPopAnimating = false;
+    }, 270); // Match the faster animation duration
+    
     event.preventDefault();
     return;
   }
