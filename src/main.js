@@ -1,15 +1,8 @@
+import { WORDS } from './dictionary.js';
+
 // Configuration constants
 const MAX_CHARACTERS = 32;
 const INITIAL_FONT_SIZE = 90; // vmin
-
-// Dictionary of 3-5 letter words
-const WORDS = [
-  'cat', 'dog', 'run', 'sun', 'fun', 'big', 'top', 'red', 'hat', 'cup',
-  'book', 'tree', 'fish', 'bird', 'rock', 'cake', 'moon', 'star', 'game', 'door',
-  'house', 'water', 'paper', 'phone', 'music', 'light', 'chair', 'table', 'green', 'smile',
-  'happy', 'quick', 'bread', 'cloud', 'beach', 'dream', 'magic', 'dance', 'heart', 'ocean',
-  'world', 'peace', 'brave', 'sweet', 'focus', 'sharp', 'grace', 'spark', 'fresh', 'royal'
-];
 
 let currentText = '';
 let wasAtMaxCharacters = false; // Track if we were at max characters
