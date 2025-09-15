@@ -9,6 +9,7 @@ let wasAtMaxCharacters = false; // Track if we were at max characters
 let isJumpAnimating = false; // Track if jump animation is currently playing
 let isPopAnimating = false; // Track if pop animation is currently playing
 let isRocketLaunching = false; // Track if rocket launch animation is currently playing
+let ignitionInterval = null; // Track ignition particle spawning interval
 const textDisplay = document.getElementById('text-display');
 
 // Color state for arrow key control
@@ -356,11 +357,111 @@ function createParticle(x, y, char, color) {
   };
 }
 
+function createIgnitionParticle(x, y, char, color) {
+  return {
+    x: x,
+    y: y,
+    vx: (Math.random() - 0.5) * 6,
+    vy: Math.random() * 3 + 2, // Downward velocity
+    life: 1.0,
+    decay: 0.015 + Math.random() * 0.01, // Slower decay
+    char: char,
+    size: Math.random() * 0.3 + 0.4, // Smaller particles
+    color: color,
+    element: null
+  };
+}
+
 function spawnParticleEffect(x, y, char) {
   const numParticles = 8 + Math.random() * 6;
   const currentColor = getComputedStyle(textDisplay).color;
   for (let i = 0; i < numParticles; i++) {
     particles.push(createParticle(x, y, char, currentColor));
+  }
+}
+
+function calculateAllCharPositions() {
+  if (currentText.length === 0) return [];
+
+  // Create a temporary element to measure character positions
+  const tempElement = document.createElement('span');
+  tempElement.style.visibility = 'hidden';
+  tempElement.style.position = 'absolute';
+  tempElement.style.whiteSpace = 'nowrap';
+  tempElement.style.fontFamily = 'monospace';
+  tempElement.style.fontSize = textDisplay.style.fontSize;
+  document.body.appendChild(tempElement);
+
+  // Get total text width for centering calculations
+  tempElement.textContent = currentText;
+  const fullWidth = tempElement.getBoundingClientRect().width;
+
+  const displayRect = textDisplay.getBoundingClientRect();
+  const textStartX = displayRect.left + (displayRect.width - fullWidth) / 2;
+  const textCenterY = displayRect.top + displayRect.height / 2;
+
+  const positions = [];
+
+  for (let i = 0; i < currentText.length; i++) {
+    // Measure width up to this character
+    tempElement.textContent = currentText.slice(0, i);
+    const widthBefore = tempElement.getBoundingClientRect().width;
+
+    // Measure width including this character
+    tempElement.textContent = currentText.slice(0, i + 1);
+    const widthIncluding = tempElement.getBoundingClientRect().width;
+    const charWidth = widthIncluding - widthBefore;
+
+    const charCenterX = textStartX + widthBefore + charWidth / 2;
+
+    positions.push({
+      x: charCenterX,
+      y: textCenterY,
+      char: currentText[i]
+    });
+  }
+
+  document.body.removeChild(tempElement);
+  return positions;
+}
+
+function spawnIgnitionEffect() {
+  const charPositions = calculateAllCharPositions();
+  const currentColor = getComputedStyle(textDisplay).color;
+
+  charPositions.forEach(pos => {
+    // Spawn 2-4 ignition particles per character
+    const numParticles = 2 + Math.random() * 3;
+    for (let i = 0; i < numParticles; i++) {
+      particles.push(createIgnitionParticle(pos.x, pos.y, pos.char, currentColor));
+    }
+  });
+}
+
+function startContinuousIgnition(duration) {
+  // Spawn particles immediately
+  spawnIgnitionEffect();
+
+  // Continue spawning particles every 100ms during the animation
+  ignitionInterval = setInterval(() => {
+    if (currentText.length > 0) { // Only spawn if there's still text
+      spawnIgnitionEffect();
+    }
+  }, 100);
+
+  // Stop spawning after the animation duration
+  setTimeout(() => {
+    if (ignitionInterval) {
+      clearInterval(ignitionInterval);
+      ignitionInterval = null;
+    }
+  }, duration);
+}
+
+function stopContinuousIgnition() {
+  if (ignitionInterval) {
+    clearInterval(ignitionInterval);
+    ignitionInterval = null;
   }
 }
 
@@ -504,6 +605,9 @@ function handleKeyPress(event) {
     void textDisplay.offsetHeight; // Force reflow to restart animation
     textDisplay.classList.add('rocket-launch-animation');
 
+    // Start continuous ignition particles that fall downward throughout the animation
+    startContinuousIgnition(animationDuration);
+
     // Play rocket sound with fade-out (double the animation duration)
     playRocketSound((animationDuration * 2) / 1000); // Convert to seconds
 
@@ -512,6 +616,7 @@ function handleKeyPress(event) {
       currentText = '';
       updateDisplay();
       textDisplay.classList.remove('rocket-launch-animation');
+      stopContinuousIgnition(); // Ensure ignition stops
       isRocketLaunching = false;
     }, animationDuration);
 
