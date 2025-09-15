@@ -13,7 +13,8 @@ A fullscreen kiosk application built with Tauri that creates an immersive text t
 - **Interactive Color Control**: Arrow keys control hue (left/right) and lightness (up/down)
 - **Audio Feedback**: Bell sound at character limit, carriage return sound on text reset
 - **Jump Animation**: Bouncy text animation with boing sound effect
-- **Function Key Shortcuts**: F1 for random words, F2 for jump animation, F3 for color changes
+- **Rocket Launch**: F4 triggers dramatic 6-second rocket launch with 12-second sound fade-out
+- **Function Key Shortcuts**: F1 for random words, F2 for jump animation, F3 for color changes, F4 for rocket launch
 - **Real-time Input**: Immediate character display with Atkinson Hyperlegible font for optimal readability
 
 ## Development
@@ -39,6 +40,7 @@ pnpm tauri info
 - **F1**: Generate random word with color change
 - **F2**: Trigger bouncy jump animation with boing sound (prevents spam)
 - **F3**: Change to random color instantly
+- **F4**: Launch text like a rocket with accelerating animation and fading sound
 - **Arrow Keys**: Left/Right to adjust hue, Up/Down to adjust lightness
 - **32 Characters**: Bell sound plays when limit is reached
 - **Empty Text**: Carriage return sound plays and color randomizes when text becomes empty
@@ -51,3 +53,4 @@ pnpm tauri info
 - **Typewriter - single key - type 3.wav** by yottasounds -- https://freesound.org/s/380136/ -- License: Creative Commons 0
 - **Typewriter Carriage Return.wav** by ramsamba -- https://freesound.org/s/318686/ -- License: Creative Commons 0
 - **boing.wav**: "Boing 1" by magnuswaker -- https://freesound.org/s/540788/ -- License: Creative Commons 0
+- **rocket.wav**: "AERORckt_Rocket roar 3-3.Steady (more low end).Crackle.Squawking_EM_(11lrs).wav" by newlocknew -- https://freesound.org/s/627117/ -- License: Attribution NonCommercial 4.0

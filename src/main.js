@@ -8,6 +8,7 @@ let currentText = '';
 let wasAtMaxCharacters = false; // Track if we were at max characters
 let isJumpAnimating = false; // Track if jump animation is currently playing
 let isPopAnimating = false; // Track if pop animation is currently playing
+let isRocketLaunching = false; // Track if rocket launch animation is currently playing
 const textDisplay = document.getElementById('text-display');
 
 // Color state for arrow key control
@@ -36,6 +37,7 @@ let bellBuffer = null;
 let resetBuffer = null;
 let boingBuffer = null;
 let popBuffer = null;
+let rocketBuffer = null;
 
 async function initAudio() {
   try {
@@ -89,6 +91,15 @@ async function initAudio() {
       popBuffer = await audioContext.decodeAudioData(popArrayBuffer);
     } catch (e) {
       console.warn('Failed to load pop.wav:', e);
+    }
+
+    // Load rocket sound
+    try {
+      const rocketResponse = await fetch('rocket.wav');
+      const rocketArrayBuffer = await rocketResponse.arrayBuffer();
+      rocketBuffer = await audioContext.decodeAudioData(rocketArrayBuffer);
+    } catch (e) {
+      console.warn('Failed to load rocket.wav:', e);
     }
   } catch (e) {
     console.warn('Audio context initialization failed:', e);
@@ -190,24 +201,56 @@ function playBoingSound() {
 
 function playPopSound() {
   if (!audioContext || !popBuffer) return;
-  
+
   try {
     // Resume audio context if suspended
     if (audioContext.state === 'suspended') {
       audioContext.resume();
     }
-    
+
     const source = audioContext.createBufferSource();
     const gainNode = audioContext.createGain();
-    
+
     source.buffer = popBuffer;
     source.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    
+
     gainNode.gain.value = 1.0; // Pop sound volume
     source.start(0);
   } catch (e) {
     console.warn('Pop sound play failed:', e);
+  }
+}
+
+function playRocketSound(duration) {
+  if (!audioContext || !rocketBuffer) return null;
+
+  try {
+    // Resume audio context if suspended
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+
+    const source = audioContext.createBufferSource();
+    const gainNode = audioContext.createGain();
+
+    source.buffer = rocketBuffer;
+    source.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    // Start with full volume
+    gainNode.gain.value = 1.0;
+
+    // Fade out over the duration
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+
+    source.start(0);
+    source.stop(audioContext.currentTime + duration);
+
+    return { source, gainNode };
+  } catch (e) {
+    console.warn('Rocket sound play failed:', e);
+    return null;
   }
 }
 
@@ -443,6 +486,35 @@ function handleKeyPress(event) {
   if (char === 'F3') {
     // Change to random color
     setRandomColor();
+    event.preventDefault();
+    return;
+  }
+
+  if (char === 'F4') {
+    // Ignore F4 if animation is already playing or if there's no text
+    if (isRocketLaunching || currentText.length === 0) {
+      event.preventDefault();
+      return;
+    }
+
+    // Trigger rocket launch animation
+    const animationDuration = 6000; // 6 seconds
+    isRocketLaunching = true;
+    textDisplay.classList.remove('rocket-launch-animation');
+    void textDisplay.offsetHeight; // Force reflow to restart animation
+    textDisplay.classList.add('rocket-launch-animation');
+
+    // Play rocket sound with fade-out (double the animation duration)
+    playRocketSound((animationDuration * 2) / 1000); // Convert to seconds
+
+    // Clear the text after animation completes
+    setTimeout(() => {
+      currentText = '';
+      updateDisplay();
+      textDisplay.classList.remove('rocket-launch-animation');
+      isRocketLaunching = false;
+    }, animationDuration);
+
     event.preventDefault();
     return;
   }

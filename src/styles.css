@@ -65,3 +65,16 @@ html, body {
 .pop-animation {
   animation: pop 0.27s ease-in-out;
 }
+
+@keyframes rocket-launch {
+  0% {
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    transform: translate(-50%, -300vh);
+  }
+}
+
+.rocket-launch-animation {
+  animation: rocket-launch 6s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}

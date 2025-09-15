@@ -37,7 +37,3 @@ This is a Tauri application that creates a fullscreen kiosk text display applica
 
 - Always run the app at the end of an implementation so I can test
 - Almost all changes will go into src/main.js ; always check that file first
-
-## Sound Attribution
-
-- **boing.wav**: "Boing 1" by magnuswaker - https://freesound.org/s/540788/ - License: Creative Commons 0
