@@ -514,9 +514,34 @@ function renderParticles() {
   });
 }
 
+let lastFrameTime = performance.now();
+
 function animateParticles() {
+  const currentTime = performance.now();
+  const actualFrameTime = currentTime - lastFrameTime;
+
   updateParticles();
   renderParticles();
+
+  // If frame took more than 200ms, remove 5% of particles
+  if (actualFrameTime > 200 && particles.length > 0) {
+    const particlesToRemove = Math.max(1, Math.floor(particles.length * 0.05));
+
+    for (let i = 0; i < particlesToRemove; i++) {
+      const randomIndex = Math.floor(Math.random() * particles.length);
+      const particle = particles[randomIndex];
+
+      // Clean up DOM element
+      if (particle.element) {
+        particle.element.remove();
+      }
+
+      // Remove particle from array
+      particles.splice(randomIndex, 1);
+    }
+  }
+
+  lastFrameTime = currentTime;
   requestAnimationFrame(animateParticles);
 }
 
